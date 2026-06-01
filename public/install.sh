@@ -190,6 +190,18 @@ CT_NODES=("gd-ct-dualstack.ip.zstaticcdn.com")
 CU_NODES=("gd-cu-dualstack.ip.zstaticcdn.com")
 CM_NODES=("gd-cm-dualstack.ip.zstaticcdn.com")
 
+pick_node() {
+    local nodes=("$@")
+    local count=${#nodes[@]}
+
+    if [ "${count}" -eq 0 ]; then
+        echo ""
+        return
+    fi
+
+    echo "${nodes[$((RANDOM % count))]}"
+}
+
 # ==============================================================================
 # 高并发/无竞态后台网络 Worker 协程
 # ==============================================================================
@@ -211,10 +223,9 @@ run_network_worker() {
         
         # 30秒检测一次网络延迟
         if [ $((now - last_ping)) -ge 30 ] || [ "$last_ping" -eq 0 ]; then
-            local rand_idx=$((RANDOM % 3))
-            get_ping "${CT_NODES[$rand_idx]}" > /dev/shm/.cf_ping_ct.tmp && mv /dev/shm/.cf_ping_ct.tmp /dev/shm/.cf_ping_ct || true
-            get_ping "${CU_NODES[$rand_idx]}" > /dev/shm/.cf_ping_cu.tmp && mv /dev/shm/.cf_ping_cu.tmp /dev/shm/.cf_ping_cu || true
-            get_ping "${CM_NODES[$rand_idx]}" > /dev/shm/.cf_ping_cm.tmp && mv /dev/shm/.cf_ping_cm.tmp /dev/shm/.cf_ping_cm || true
+            get_ping "$(pick_node "${CT_NODES[@]}")" > /dev/shm/.cf_ping_ct.tmp && mv /dev/shm/.cf_ping_ct.tmp /dev/shm/.cf_ping_ct || true
+            get_ping "$(pick_node "${CU_NODES[@]}")" > /dev/shm/.cf_ping_cu.tmp && mv /dev/shm/.cf_ping_cu.tmp /dev/shm/.cf_ping_cu || true
+            get_ping "$(pick_node "${CM_NODES[@]}")" > /dev/shm/.cf_ping_cm.tmp && mv /dev/shm/.cf_ping_cm.tmp /dev/shm/.cf_ping_cm || true
             get_ping "lf3-ips.zstaticcdn.com" > /dev/shm/.cf_ping_bd.tmp && mv /dev/shm/.cf_ping_bd.tmp /dev/shm/.cf_ping_bd || true
             last_ping="$now"
         fi
