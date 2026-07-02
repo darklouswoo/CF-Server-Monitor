@@ -580,6 +580,8 @@ Sec-WebSocket-Version: 13
 
 > `subscribe=all` 默认不推送任何服务器更新。客户端应先调用 `/api/servers` 获取当前可见服务器列表，再通过 WebSocket 通道发送 `subscribe` 消息，使用 `servers[].id` 作为过滤列表。该过滤是客户端订阅范围控制，不是服务端鉴权。
 
+> `subscribe=all` 默认不推送任何服务器更新。客户端应先调用 `/api/servers` 获取当前可见服务器列表，再通过 WebSocket 通道发送 `subscribe` 消息，使用 `servers[].id` 作为过滤列表。该过滤是客户端订阅范围控制，不是服务端鉴权。
+
 **服务端 → 客户端消息**：
 
 1. 连接成功（Hello）
